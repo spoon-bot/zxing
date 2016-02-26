@@ -26,6 +26,7 @@ import com.google.zxing.ReaderException;
 import com.google.zxing.Result;
 import com.google.zxing.ResultMetadataType;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.imageio.ImageIO;
@@ -54,6 +55,7 @@ import java.util.logging.Logger;
  * @author Sean Owen
  * @author dswitkin@google.com (Daniel Switkin)
  */
+@Ignore
 public abstract class AbstractBlackBoxTestCase extends Assert {
 
   private static final Logger log = Logger.getLogger(AbstractBlackBoxTestCase.class.getSimpleName());

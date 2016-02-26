@@ -47,24 +47,8 @@
         <version>18.0</version>
       </dependency>
       <dependency>
-        <groupId>com.google.android</groupId>
-        <artifactId>android</artifactId>
-        <version>4.1.1.4</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
         <groupId>com.google.zxing</groupId>
         <artifactId>core</artifactId>
-        <version>${zxing.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.zxing</groupId>
-        <artifactId>android-core</artifactId>
-        <version>${zxing.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.zxing</groupId>
-        <artifactId>android-integration</artifactId>
         <version>${zxing.version}</version>
       </dependency>
       <dependency>
@@ -84,8 +68,6 @@
   <modules>
     <module>core</module>
     <module>javase</module>
-    <module>android-core</module>
-    <module>android-integration</module>
     <module>zxing.appspot.com</module>
     <module>zxingorg</module>
   </modules>
@@ -102,6 +84,31 @@
 
   <build>
     <plugins>
+
+      <plugin>
+        <groupId>fr.inria.gforge.spoon</groupId>
+        <artifactId>spoon-maven-plugin</artifactId>
+        <version>3.0-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <debug>true</debug>
+          <compliance>8</compliance>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>fr.inria.gforge.spoon</groupId>
+            <artifactId>spoon-core</artifactId>
+            <version>5.1.0-SNAPSHOT</version>
+          </dependency>
+        </dependencies>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -126,10 +133,6 @@
       <plugin>
         <groupId>org.apache.rat</groupId>
         <artifactId>apache-rat-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
       </plugin>
     </plugins>
     <pluginManagement>
@@ -321,49 +324,6 @@
           <version>2.6</version>
         </plugin>
         <plugin>
-          <groupId>com.simpligility.maven.plugins</groupId>
-          <artifactId>android-maven-plugin</artifactId>
-          <version>4.3.0</version>
-          <extensions>true</extensions>
-          <executions>
-            <execution>
-              <id>android-zipalign</id>
-              <phase>package</phase>
-              <goals>
-                <goal>zipalign</goal>
-              </goals>
-            </execution>
-          </executions>
-          <configuration>
-            <sdk>
-              <platform>22</platform>
-            </sdk>
-            <proguard>
-              <skip>true</skip>
-            </proguard>
-            <sign>
-              <debug>true</debug>
-            </sign>
-            <zipalign>
-              <skip>false</skip>
-            </zipalign>
-            <release>false</release>
-            <apkDebug>true</apkDebug>
-            <androidManifestFile>AndroidManifest.xml</androidManifestFile>
-            <resourceDirectory>res</resourceDirectory>
-            <assetsDirectory>assets</assetsDirectory>
-            <nativeLibrariesDirectory>libs</nativeLibrariesDirectory>
-            <disableConflictingDependenciesWarning>true</disableConflictingDependenciesWarning>
-          </configuration>
-          <dependencies>
-            <dependency>
-              <groupId>net.sf.proguard</groupId>
-              <artifactId>proguard-base</artifactId>
-              <version>5.2.1</version>
-            </dependency>
-          </dependencies>
-        </plugin>
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
           <version>3.4</version>
@@ -387,25 +347,6 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jxr-plugin</artifactId>
           <version>2.5</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>2.17</version>
-          <configuration>
-            <configLocation>src/checkstyle/checkstyle.xml</configLocation>
-            <!-- Android generated files -->
-            <excludes>**/R.java,**/BuildConfig.java</excludes>
-          </configuration>
-          <executions>
-            <execution>
-              <id>validate</id>
-              <phase>validate</phase>
-              <goals>
-                <goal>check</goal>
-              </goals>
-            </execution>
-          </executions>
         </plugin>
         <plugin>
           <groupId>org.apache.rat</groupId>
@@ -626,56 +567,6 @@
   </distributionManagement>
 
   <profiles>
-    <profile>
-      <id>build-android</id>
-      <activation>
-        <property>
-          <name>env.ANDROID_HOME</name>
-        </property>
-      </activation>
-      <modules>
-        <module>android</module>
-        <module>androidtest</module>
-        <module>glass</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>android-release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jarsigner-plugin</artifactId>
-          </plugin>
-          <plugin>
-            <groupId>com.simpligility.maven.plugins</groupId>
-            <artifactId>android-maven-plugin</artifactId>
-            <configuration>
-              <proguard>
-                <skip>false</skip>
-                <config>proguard.cfg</config>
-              </proguard>
-              <sign>
-                <debug>false</debug>
-              </sign>
-              <release>true</release>
-              <apkDebug>false</apkDebug>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
     <profile>
       <id>jacoco</id>
       <build>
